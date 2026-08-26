@@ -1,4 +1,3 @@
-
 # 🛡️ DockerFactor
 
 <div align="center">
@@ -18,7 +17,7 @@
 [![Runtime](https://img.shields.io/badge/.NET_10-Native_AOT-purple.svg?style=for-the-badge)]()
 [![Security](https://img.shields.io/badge/Security-Zero_Trust-green.svg?style=for-the-badge)]()
 
-[Motivation](#-motivation) • [Features](#-key-features) • [Architecture](#-architecture) • [Quick Start](#-quick-start) • [CLI Reference](#-cli-commands) • [Roadmap](#-roadmap)
+[Motivation](#-motivation) • [Features](#-key-features) • [Architecture](ARCHITECTURE.md) • [Quick Start](#-quick-start) • [CLI Reference](#-cli-commands) • [Roadmap](#-roadmap)
 
 </div>
 
@@ -140,4 +139,3 @@ Crafted with ❤️ by **Miguel Valdez** ([@migueval](https://github.com/migueva
 *Solutions & Software Architect • Zero-Trust & Distributed Systems Specialist*
 
 </div>
-
