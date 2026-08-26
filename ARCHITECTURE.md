@@ -37,7 +37,7 @@ Upon successful provisioning, the target server MUST satisfy the following basel
 3. **Outbound Cloudflare Tunnel Ingress:** `cloudflared` maintains outbound connections to Cloudflare Edge servers, publishing ONLY explicitly authorized routes.
 4. **Unique Cryptographic Identity:** Every VPS possesses an isolated, revocable keypair and agent certificate.
 5. **Immutable Artifacts:** Deployed containers are versioned and pinned by sha256 digests (`image@sha256:...`).
-6. **Least Privilege Execution:** Containers execute as non-root users (`USER 10001`) with strict RAM, CPU, and PID limits.
+6. **Least Privilege Execution:** Containers execute as non-root users (`USER 10001`, `readOnlyRootFilesystem: true`, `dropCapabilities: [ALL]`) following OWASP ASVS v4.0 security best practices.
 7. **Append-Only Audit Logging:** Every administrative mutation produces an immutable audit record.
 8. **Automated Rollback:** Defective deployments automatically trigger a rollback to the previous stable release.
 
@@ -173,5 +173,7 @@ spec:
 ---
 
 ## 📄 License & Author
+Crafted and maintained by **Miguel Valdez** ([@migueval](https://github.com/migueval)) under the **MIT License**.
 
 Crafted and maintained by **Miguel Valdez** ([@migueval](https://github.com/migueval)) under the **MIT License**.
+
