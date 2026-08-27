@@ -9,9 +9,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- **Phase 1 (Step 1 Completed):** Provisioning script (`scripts/install.sh`) with automated OS detection (Ubuntu/Debian), architecture check (`amd64`/`arm64`), official Docker GPG keyrings setup, and Docker Engine + Compose V2 installer.
+
 ### Planned
-- **Phase 1:** One-Line VPS Installer Script (`install.sh`) with UFW zero-inbound firewall hardening.
-- **Phase 2:** Cloudflare Tunnel (`cloudflared`) egress routing engine & API token automation.
+- **Phase 1 (Step 2):** Cloudflare Tunnel (`cloudflared`) installation, UFW zero-inbound firewall hardening, `DOCKER-USER` iptables bypass prevention, and 256-bit CSPRNG pairing token generation.
+- **Phase 2:** Ingress routing engine & API token automation.
 - **Phase 3:** Core C# (.NET 10 Native AOT) CLI (`docker-factor`) with Spectre.Console Terminal UI (TUI).
 - **Phase 4:** Smart Docker Hardening Generator for .NET Native AOT, Node/NestJS, and Go.
 - **Phase 5:** Automated GitHub Actions Workflow Generator (`.github/workflows/deploy.yml`).
