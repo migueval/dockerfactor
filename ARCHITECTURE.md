@@ -65,6 +65,12 @@ Each environment or client receives:
 ### 3.5 Verifiable Security Baseline
 DockerFactor verifies firewall rules (UFW/nftables/iptables) locally from the host and validates zero public port exposure via out-of-band external port scans.
 
+### 3.6 Modular Ingress Abstraction
+While Cloudflare Tunnels (`cloudflared`) serve as the default zero-inbound ingress provider, the ingress architecture is fully decoupled via an abstract ingress adapter interface. This enables seamless support for alternative mesh networks (Tailscale, WireGuard) or local reverse proxies without breaking core deployment workflows.
+
+### 3.7 Declarative Reconciliation & Drift Control
+The agent continuously reconciles the observed runtime state (active Docker containers, UFW firewall rules, tunnel bindings) against the declared manifest state. Any manual out-of-band mutations or container drifts are automatically detected, logged, and corrected.
+
 ---
 
 ## 4. Logical Architecture Model
@@ -110,7 +116,7 @@ Resident daemon on each VPS (written in C# .NET 10 Native AOT / Go).
 ### 5.3 Deployment & Hardening Engine
 Parses declarative YAML manifests and enforces mandatory container security profiles:
 - Non-root user `USER 10001`.
-- `readOnlyRootFilesystem: true`.
+- `readOnlyRootFilesystem: true` with automatic `tmpfs` mounts (e.g. `/tmp:rw,noexec,nosuid`, `/var/tmp`) per technology stack (Node.js, Python, .NET).
 - `noNewPrivileges: true`.
 - `dropCapabilities: [ALL]`.
 - Enforces strict memory, CPU, and PID limits.
@@ -173,7 +179,5 @@ spec:
 ---
 
 ## 📄 License & Author
-Crafted and maintained by **Miguel Valdez** ([@migueval](https://github.com/migueval)) under the **MIT License**.
-
 Crafted and maintained by **Miguel Valdez** ([@migueval](https://github.com/migueval)) under the **MIT License**.
 
