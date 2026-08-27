@@ -97,16 +97,16 @@ if command -v cloudflared &> /dev/null; then
     log_warn "cloudflared daemon is already installed. Skipping."
 else
     log_info "Installing Cloudflare Tunnel daemon (cloudflared)..."
-    mkdir -p /usr/share/keyrings
-    curl -fsSL https://pkg.cloudflare.com/cloudflare-main.gpg | gpg --dearmor -o /usr/share/keyrings/cloudflare-main.gpg --yes
+    CF_ARCH=$ARCH
+    [[ "$ARCH" == "x86_64" ]] && CF_ARCH="amd64"
+    [[ "$ARCH" == "aarch64" ]] && CF_ARCH="arm64"
 
-    echo "deb [signed-by=/usr/share/keyrings/cloudflare-main.gpg] https://pkg.cloudflare.com/cloudflared $CODENAME main" \
-        | tee /etc/apt/sources.list.d/cloudflared.list > /dev/null || \
-    echo "deb [signed-by=/usr/share/keyrings/cloudflare-main.gpg] https://pkg.cloudflare.com/cloudflared bookworm main" \
-        | tee /etc/apt/sources.list.d/cloudflared.list > /dev/null
+    # Download official Cloudflare deb package (compatible with Debian 13 trixie & Ubuntu)
+    curl -fsSL -o /tmp/cloudflared.deb "https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-${CF_ARCH}.deb" || \
+    curl -fsSL -o /tmp/cloudflared.deb "https://pkg.cloudflare.com/cloudflared-stable-linux-${CF_ARCH}.deb"
 
-    apt-get update -qq
-    apt-get install -y -qq cloudflared > /dev/null
+    dpkg -i /tmp/cloudflared.deb > /dev/null 2>&1 || apt-get install -f -y -qq > /dev/null
+    rm -f /tmp/cloudflared.deb
     log_success "cloudflared installed successfully."
 fi
 
