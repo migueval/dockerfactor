@@ -10,6 +10,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- **Phase 3 (100% Completed):** Core C# CLI application (`src/DockerFactor.CLI`) with Spectre.Console TUI:
+  - `docker-factor connect <TOKEN>`: Validates 256-bit ephemeral pairing token and persists state to `~/.dockerfactor/config.json`.
+  - `docker-factor tunnel <URL>`: Deploys instant Cloudflare QuickTunnels (`trycloudflare.com`) with TUI cards and graceful cleanup on exit.
+  - `docker-factor audit`: Runs Zero-Trust posture security scan and outputs rich formatted score table.
+  - Native AOT compliant string formatting and reflection-free JSON serialization.
 - **Phase 2 (100% Completed):** Ingress Adapter architecture & free Cloudflare Quick Tunnels:
   - Abstract `IIngressAdapter` interface in `DockerFactor.Core`.
   - `QuickTunnelAdapter` supporting free domain-less HTTPS routes via `trycloudflare.com`.
