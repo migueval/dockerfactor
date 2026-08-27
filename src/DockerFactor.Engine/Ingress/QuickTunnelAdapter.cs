@@ -19,10 +19,19 @@ public class QuickTunnelAdapter : IIngressAdapter
 
     public async Task<IngressRoute> CreateRouteAsync(string internalTargetService, CancellationToken cancellationToken = default)
     {
+        var fileName = "cloudflared";
+        var arguments = $"tunnel --url {internalTargetService}";
+
+        if (OperatingSystem.IsWindows() && !IsCommandAvailable("cloudflared"))
+        {
+            fileName = "wsl";
+            arguments = $"cloudflared tunnel --url {internalTargetService}";
+        }
+
         var psi = new ProcessStartInfo
         {
-            FileName = "cloudflared",
-            Arguments = $"tunnel --url {internalTargetService}",
+            FileName = fileName,
+            Arguments = arguments,
             RedirectStandardOutput = true,
             RedirectStandardError = true,
             UseShellExecute = false,
@@ -46,9 +55,19 @@ public class QuickTunnelAdapter : IIngressAdapter
         process.OutputDataReceived += handler;
         process.ErrorDataReceived += handler;
 
-        if (!process.Start())
+        try
         {
-            throw new InvalidOperationException("Failed to start cloudflared binary. Ensure 'cloudflared' is installed and available on PATH.");
+            if (!process.Start())
+            {
+                throw new InvalidOperationException("Failed to start cloudflared process.");
+            }
+        }
+        catch (Exception ex)
+        {
+            throw new InvalidOperationException(
+                "Could not execute 'cloudflared'. Ensure cloudflared is installed on PATH or inside WSL (run 'winget install Cloudflare.cloudflared' or install via WSL script).",
+                ex
+            );
         }
 
         process.BeginOutputReadLine();
@@ -90,5 +109,28 @@ public class QuickTunnelAdapter : IIngressAdapter
         }
 
         return Task.CompletedTask;
+    }
+
+    private static bool IsCommandAvailable(string command)
+    {
+        try
+        {
+            using var proc = Process.Start(new ProcessStartInfo
+            {
+                FileName = OperatingSystem.IsWindows() ? "where" : "which",
+                Arguments = command,
+                RedirectStandardOutput = true,
+                RedirectStandardError = true,
+                UseShellExecute = false,
+                CreateNoWindow = true
+            });
+
+            proc?.WaitForExit();
+            return proc?.ExitCode == 0;
+        }
+        catch
+        {
+            return false;
+        }
     }
 }
