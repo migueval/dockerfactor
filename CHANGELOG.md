@@ -10,6 +10,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- **Phase 2 (100% Completed):** Ingress Adapter architecture & free Cloudflare Quick Tunnels:
+  - Abstract `IIngressAdapter` interface in `DockerFactor.Core`.
+  - `QuickTunnelAdapter` supporting free domain-less HTTPS routes via `trycloudflare.com`.
+  - `CloudflareManagedAdapter` for token-based custom domain routing.
+  - Automated regex parser and process manager for `cloudflared`.
+  - Unit test suite (`DockerFactor.Engine.Tests`) with 4 passing xUnit tests.
 - **Phase 1 (100% Completed):** Single-line VPS provisioning script (`scripts/install.sh`) featuring:
   - Automated OS detection (Ubuntu/Debian) and CPU architecture validation (`amd64`/`arm64`).
   - Docker Engine (`v29.7.2`) & Docker Compose V2 (`v5.5.0`) installer.

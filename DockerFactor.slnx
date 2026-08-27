@@ -1,0 +1,9 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/DockerFactor.Core/DockerFactor.Core.csproj" />
+    <Project Path="src/DockerFactor.Engine/DockerFactor.Engine.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/DockerFactor.Engine.Tests/DockerFactor.Engine.Tests.csproj" />
+  </Folder>
+</Solution>
