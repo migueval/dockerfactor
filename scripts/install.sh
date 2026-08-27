@@ -66,6 +66,9 @@ log_success "OS and Architecture validation PASSED."
 # ------------------------------------------------------------------------------
 # 3. Install Prerequisites & Docker Engine + Compose V2
 # ------------------------------------------------------------------------------
+# Clean up any stale or invalid cloudflared repository list from previous attempts
+rm -f /etc/apt/sources.list.d/cloudflared.list
+
 log_info "Installing package prerequisites (ca-certificates, curl, gnupg, ufw, iptables)..."
 apt-get update -qq
 apt-get install -y -qq ca-certificates curl gnupg lsb-release ufw iptables openssl > /dev/null
