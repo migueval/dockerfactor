@@ -10,12 +10,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
-- **Phase 1 (Step 1 Completed):** Provisioning script (`scripts/install.sh`) with automated OS detection (Ubuntu/Debian), architecture check (`amd64`/`arm64`), official Docker GPG keyrings setup, and Docker Engine + Compose V2 installer.
+- **Phase 1 (100% Completed):** Single-line VPS provisioning script (`scripts/install.sh`) featuring:
+  - Automated OS detection (Ubuntu/Debian) and CPU architecture validation (`amd64`/`arm64`).
+  - Docker Engine (`v29.7.2`) & Docker Compose V2 (`v5.5.0`) installer.
+  - Cloudflare Tunnel daemon (`cloudflared v2026.8.2`) installer with direct `.deb` fallback supporting Debian 13 (`trixie`).
+  - Zero-Trust UFW firewall hardening (0 public inbound ports exposed).
+  - `DOCKER-USER` iptables chain injection on default network interface to block Docker daemon port bypasses.
+  - Ephemeral 256-bit CSPRNG cryptographic pairing token generator (`/etc/dockerfactor/pairing.json`, 15-minute TTL).
 
 ### Planned
-- **Phase 1 (Step 2):** Cloudflare Tunnel (`cloudflared`) installation, UFW zero-inbound firewall hardening, `DOCKER-USER` iptables bypass prevention, and 256-bit CSPRNG pairing token generation.
-- **Phase 2:** Ingress routing engine & API token automation.
-- **Phase 3:** Core C# (.NET 10 Native AOT) CLI (`docker-factor`) with Spectre.Console Terminal UI (TUI).
+- **Phase 2 & 3:** C# (.NET 10 Native AOT) CLI (`docker-factor`) initialization with Spectre.Console TUI and `connect <TOKEN>` pairing command.
 - **Phase 4:** Smart Docker Hardening Generator for .NET Native AOT, Node/NestJS, and Go.
 - **Phase 5:** Automated GitHub Actions Workflow Generator (`.github/workflows/deploy.yml`).
 
