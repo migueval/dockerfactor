@@ -25,7 +25,10 @@ public class QuickTunnelAdapter : IIngressAdapter
         if (OperatingSystem.IsWindows() && !IsCommandAvailable("cloudflared"))
         {
             fileName = "wsl";
-            arguments = $"cloudflared tunnel --url {internalTargetService}";
+            var targetDistro = GetTargetWslDistro();
+            arguments = string.IsNullOrEmpty(targetDistro)
+                ? $"cloudflared tunnel --url {internalTargetService}"
+                : $"-d {targetDistro} cloudflared tunnel --url {internalTargetService}";
         }
 
         var psi = new ProcessStartInfo
@@ -109,6 +112,43 @@ public class QuickTunnelAdapter : IIngressAdapter
         }
 
         return Task.CompletedTask;
+    }
+
+    private static string? GetTargetWslDistro()
+    {
+        if (!OperatingSystem.IsWindows()) return null;
+
+        try
+        {
+            using var proc = Process.Start(new ProcessStartInfo
+            {
+                FileName = "wsl",
+                Arguments = "--list --quiet",
+                RedirectStandardOutput = true,
+                RedirectStandardError = true,
+                UseShellExecute = false,
+                CreateNoWindow = true
+            });
+
+            if (proc == null) return null;
+
+            var output = proc.StandardOutput.ReadToEnd();
+            proc.WaitForExit();
+
+            var distros = output
+                .Replace("\0", "")
+                .Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries)
+                .Select(d => d.Trim())
+                .Where(d => !string.IsNullOrWhiteSpace(d) &&
+                            !d.StartsWith("docker-desktop", StringComparison.OrdinalIgnoreCase))
+                .ToList();
+
+            return distros.FirstOrDefault();
+        }
+        catch
+        {
+            return null;
+        }
     }
 
     private static bool IsCommandAvailable(string command)
