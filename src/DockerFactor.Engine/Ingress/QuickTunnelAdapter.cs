@@ -117,6 +117,32 @@ public class QuickTunnelAdapter : IIngressAdapter
             }
         }
 
+        if (OperatingSystem.IsWindows())
+        {
+            try
+            {
+                var targetDistro = GetTargetWslDistro();
+                var args = string.IsNullOrEmpty(targetDistro)
+                    ? "pkill -f cloudflared"
+                    : $"-d {targetDistro} pkill -f cloudflared";
+
+                using var pkill = Process.Start(new ProcessStartInfo
+                {
+                    FileName = "wsl",
+                    Arguments = args,
+                    RedirectStandardOutput = true,
+                    RedirectStandardError = true,
+                    UseShellExecute = false,
+                    CreateNoWindow = true
+                });
+                pkill?.WaitForExit(2000);
+            }
+            catch
+            {
+                // Ignore cleanup errors
+            }
+        }
+
         return Task.CompletedTask;
     }
 
