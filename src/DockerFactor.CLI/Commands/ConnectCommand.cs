@@ -16,13 +16,15 @@ public class ConnectCommandSettings : CommandSettings
 
 public class ConnectCommand : Command<ConnectCommandSettings>
 {
+    private static readonly System.Text.RegularExpressions.Regex HexTokenRegex = new(@"^[0-9a-fA-F]{64}$", System.Text.RegularExpressions.RegexOptions.Compiled);
+
     public override int Execute([NotNull] CommandContext context, [NotNull] ConnectCommandSettings settings)
     {
         TerminalRenderer.RenderHeader();
 
-        if (string.IsNullOrWhiteSpace(settings.Token) || settings.Token.Length < 32)
+        if (string.IsNullOrWhiteSpace(settings.Token) || !HexTokenRegex.IsMatch(settings.Token.Trim()))
         {
-            AnsiConsole.MarkupLine("[bold red]Error:[/] Invalid pairing token format. Expected 256-bit hex token.");
+            AnsiConsole.MarkupLine("[bold red]Error:[/] Invalid pairing token format. Expected a 64-character (256-bit) hex token.");
             return 1;
         }
 

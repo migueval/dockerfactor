@@ -19,16 +19,22 @@ public class QuickTunnelAdapter : IIngressAdapter
 
     public async Task<IngressRoute> CreateRouteAsync(string internalTargetService, CancellationToken cancellationToken = default)
     {
+        if (!Uri.TryCreate(internalTargetService, UriKind.Absolute, out var validatedUri) ||
+            (validatedUri.Scheme != Uri.UriSchemeHttp && validatedUri.Scheme != Uri.UriSchemeHttps))
+        {
+            throw new ArgumentException("Target service must be a valid HTTP or HTTPS URL.", nameof(internalTargetService));
+        }
+
         var fileName = "cloudflared";
-        var arguments = $"tunnel --url {internalTargetService}";
+        var arguments = $"tunnel --url {validatedUri.AbsoluteUri}";
 
         if (OperatingSystem.IsWindows() && !IsCommandAvailable("cloudflared"))
         {
             fileName = "wsl";
             var targetDistro = GetTargetWslDistro();
             arguments = string.IsNullOrEmpty(targetDistro)
-                ? $"cloudflared tunnel --url {internalTargetService}"
-                : $"-d {targetDistro} cloudflared tunnel --url {internalTargetService}";
+                ? $"cloudflared tunnel --url {validatedUri.AbsoluteUri}"
+                : $"-d {targetDistro} cloudflared tunnel --url {validatedUri.AbsoluteUri}";
         }
 
         var psi = new ProcessStartInfo
@@ -85,7 +91,7 @@ public class QuickTunnelAdapter : IIngressAdapter
 
             return new IngressRoute(
                 PublicUrl: publicUrl,
-                InternalTargetService: internalTargetService,
+                InternalTargetService: validatedUri.AbsoluteUri,
                 ProviderName: ProviderName,
                 CreatedAtUtc: DateTime.UtcNow,
                 ProcessId: process.Id
@@ -100,7 +106,7 @@ public class QuickTunnelAdapter : IIngressAdapter
             try
             {
                 var process = Process.GetProcessById(route.ProcessId.Value);
-                if (!process.HasExited)
+                if (!process.HasExited && (process.ProcessName.Contains("cloudflared", StringComparison.OrdinalIgnoreCase) || process.ProcessName.Contains("wsl", StringComparison.OrdinalIgnoreCase)))
                 {
                     process.Kill(entireProcessTree: true);
                 }

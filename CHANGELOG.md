@@ -9,6 +9,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Security & Defensive Hardening (5 Code Improvements)
+- **Strict Cryptographic Token Validation:** Enforced 64-character (256-bit) hex regex validation in `ConnectCommand`.
+- **Process Memory Argument Protection:** Environment variable injection (`TUNNEL_TOKEN`) in `CloudflareManagedAdapter` to prevent token leakage via `ps aux` / process listing.
+- **Strict Target URL Scheme Validation:** Added scheme check (HTTP/HTTPS absolute URIs) in `QuickTunnelAdapter` to prevent argument injection.
+- **PID Verification & Process Recycler Guard:** Added process name verification (`cloudflared`/`wsl`) before revoking PIDs in `QuickTunnelAdapter.RevokeRouteAsync`.
+- **WSL Isolation & Distro Target Guard:** Automated non-docker-desktop WSL distro targeting for process execution isolation.
+
 ### Added
 - **Phase 3 (100% Completed):** Core C# CLI application (`src/DockerFactor.CLI`) with Spectre.Console TUI:
   - `docker-factor connect <TOKEN>`: Validates 256-bit ephemeral pairing token and persists state to `~/.dockerfactor/config.json`.

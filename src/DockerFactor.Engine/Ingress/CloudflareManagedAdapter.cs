@@ -25,12 +25,14 @@ public class CloudflareManagedAdapter : IIngressAdapter
         var psi = new ProcessStartInfo
         {
             FileName = "cloudflared",
-            Arguments = $"tunnel run --token {_tunnelToken}",
+            Arguments = "tunnel run",
             RedirectStandardOutput = true,
             RedirectStandardError = true,
             UseShellExecute = false,
             CreateNoWindow = true
         };
+
+        psi.EnvironmentVariables["TUNNEL_TOKEN"] = _tunnelToken;
 
         var process = new Process { StartInfo = psi };
 
