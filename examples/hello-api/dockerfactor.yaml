@@ -1,0 +1,9 @@
+apiVersion: dockerfactor.dev/v1alpha1
+kind: Application
+metadata:
+  name: hello-api
+spec:
+  runtime: dotnet
+  port: 8080
+  build: dotnet publish -c Release
+  command: dotnet HelloApi.dll

@@ -1,8 +1,11 @@
 # DockerFactor — Security Engine & Container Hardening Specification
 
-**Status:** Technical Security Specification (Open Source)  
+**Status:** Target security design — not a certification of the current prototype
 **Author:** Miguel Valdez ([@migueval](https://github.com/migueval))  
 **License:** MIT  
+
+> [!WARNING]
+> Controls in this document are considered implemented only when they have executable checks, automated tests and evidence from a supported environment. The `docker-factor audit` command is not implemented yet. Operators must independently validate firewall rules, exposed sockets, container privileges, image provenance and tunnel configuration.
 
 > **Transparency & Standards Alignment Notice:**  
 > DockerFactor's security engine policies have been designed **taking as reference guidelines and best practices** the recommendations from the **NIST SP 800-63-3** and **OWASP ASVS v4.0** frameworks. Using this tool helps enforce technical infrastructure controls inspired by these guidelines, but **does not constitute a formal accreditation, compliance level, or audit certification by external auditors**.

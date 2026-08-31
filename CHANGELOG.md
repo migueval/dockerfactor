@@ -1,5 +1,17 @@
 # Changelog 📜
 
+> The implementation was intentionally reset on 2026-08-31. Entries below the new Unreleased section describe the discarded exploratory prototype and are retained only as historical context.
+
+## [Unreleased] — Foundation reset
+
+### Added
+
+- Clean `Core`, `Engine` and `CLI` project boundaries targeting .NET 9.
+- Versioned `dockerfactor.dev/v1alpha1` application manifest.
+- Strict YAML parsing with unknown-field and duplicate-key rejection.
+- Read-only `docker-factor inspect [DIR]` command.
+- Stable manifest validation codes and automated tests.
+
 All notable changes to **DockerFactor** will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
@@ -17,6 +29,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **WSL Isolation & Distro Target Guard:** Automated non-docker-desktop WSL distro targeting for process execution isolation.
 
 ### Added
+- **Phase 4 (100% Completed):** Smart Docker Hardening Generator (`docker-factor init`):
+  - Added `TechnologyDetector.cs` for automated stack detection (.NET, Node.js, Go, Python).
+  - Added `DockerfileHardener.cs` generating multi-stage builds with `USER 10001` (non-root) & Distroless/Chiseled Ubuntu bases.
+  - Added `ComposeHardener.cs` generating hardened `compose.yaml` with `read_only: true`, `tmpfs: /tmp:rw,noexec,nosuid`, `cap_drop: [ALL]`, `no-new-privileges:true`, and cgroups 256MB RAM limits.
+  - Added `InitCommand.cs` (`docker-factor init`) in C# CLI with Spectre.Console TUI table & status spinner.
+  - Added `HardeningTests.cs` xUnit test suite (10/10 tests passing green).
+
 - **Phase 3 (100% Completed):** Core C# CLI application (`src/DockerFactor.CLI`) with Spectre.Console TUI:
   - `docker-factor connect <TOKEN>`: Validates 256-bit ephemeral pairing token and persists state to `~/.dockerfactor/config.json`.
   - `docker-factor tunnel <URL>`: Deploys instant Cloudflare QuickTunnels (`trycloudflare.com`) with TUI cards and graceful cleanup on exit.

@@ -8,12 +8,12 @@ Because DockerFactor manages server firewall baselines, Cloudflare Tunnels, and 
 
 ## 🔒 Supported Versions
 
-We actively release security patches and updates for the following versions:
+DockerFactor is pre-release software. There is no production-supported stable version yet. Security fixes are developed on the default branch and may include breaking changes.
 
 | Version | Supported |
 | :--- | :--- |
-| `main` branch / Latest Release | ✅ Yes |
-| Pre-release / Alpha (`v1alpha1`) | ✅ Yes |
+| `main` branch / Latest Release | ⚠️ Development support only |
+| Pre-release / Alpha (`v1alpha1`) | ⚠️ Development support only |
 | Legacy releases | ❌ No |
 
 ---

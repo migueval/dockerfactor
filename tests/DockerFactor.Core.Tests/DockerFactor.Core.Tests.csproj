@@ -20,7 +20,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\DockerFactor.Core\DockerFactor.Core.csproj" />
-    <ProjectReference Include="..\..\src\DockerFactor.Engine\DockerFactor.Engine.csproj" />
   </ItemGroup>
 
 </Project>

@@ -10,16 +10,25 @@
  |____/ \____/ \____|_|\_\____|_| \_\_|/_/   \_\____| |_| \___/|_| \_\
 ```
 
-**Zero-Inbound-Port VPS Provisioning, Cloudflare Tunnels & Hardened Container CLI**
+**Experimental CLI for hardened Docker Compose deployments and outbound-only ingress**
 
 [![Status](https://img.shields.io/badge/Status-Active_Development-orange.svg?style=for-the-badge)]()
 [![License](https://img.shields.io/badge/License-MIT-blue.svg?style=for-the-badge)](LICENSE)
-[![Runtime](https://img.shields.io/badge/.NET_10-Native_AOT-purple.svg?style=for-the-badge)]()
+[![Runtime](https://img.shields.io/badge/.NET_9-Native_AOT-purple.svg?style=for-the-badge)]()
 [![Security](https://img.shields.io/badge/Security-Zero_Trust-green.svg?style=for-the-badge)]()
 
 [Motivation](#-motivation) • [Features](#-key-features) • [Architecture](ARCHITECTURE.md) • [Quick Start](#-quick-start) • [CLI Reference](#-cli-commands) • [Roadmap](#-roadmap)
 
 </div>
+
+> [!IMPORTANT]
+> DockerFactor is an early-stage open source project under active development. It is not yet production-ready. Some commands are prototypes, while the VPS agent, cryptographic pairing, managed deployment and verified security-audit workflows described in the architecture are planned capabilities.
+
+## Current scope
+
+The first functional increment provides a strict, versioned `dockerfactor.yaml` contract and a read-only `inspect` command. It parses real YAML, rejects unknown or duplicate fields and reports stable validation codes suitable for local use and CI.
+
+DockerFactor does not currently provide a production control plane, functional mTLS enrollment, continuous reconciliation, immutable audit storage, blue/green deployments or automatic rollback.
 
 ---
 
@@ -38,11 +47,24 @@ We needed a tool that could transform a fresh Linux VPS into a hardened, product
 
 ## 🚀 Key Features
 
-* 🔒 **Zero Open Inbound Ports:** Integrates natively with Cloudflare Tunnels (`cloudflared`). Your UFW firewall denies ALL public incoming traffic while Cloudflare handles SSL/TLS, WAF, and Anti-DDoS at the Edge.
-* ⚡ **Ultra-Fast & Zero Overhead:** Built in **C# (.NET 10 Native AOT)** and **Bash**. Compiles to a single standalone binary (<20MB) with sub-millisecond startup and <15MB RAM usage.
-* 🛡️ **Smart Container Hardening:** Automatically generates production-grade Dockerfiles incorporating `USER 10001` (non-root), `readOnlyRootFilesystem: true`, *Chiseled Ubuntu / Distroless* bases, and strict cgroup limits.
-* 🤖 **Automated CI/CD:** Auto-generates pre-configured GitHub Actions workflows (`.github/workflows/deploy.yml`) for seamless Zero-Downtime rolling updates.
-* 📊 **Terminal UI & 12-Factor Auditor:** Live terminal monitoring (`docker-factor stats`) and automated compliance checking against the 12-Factor App methodology.
+* 🔒 **Outbound-Only Ingress Direction:** Designed around Cloudflare Tunnels (`cloudflared`) so applications can be published without binding public application ports.
+* ⚡ **Lightweight CLI:** Built in **C# with Native AOT enabled** and Bash. Reproducible binary-size, startup and memory benchmarks will be published with releases.
+* 🛡️ **Container Hardening Templates:** Generates Dockerfiles and Compose manifests with non-root execution, read-only filesystems, dropped capabilities and resource limits. These controls must still be verified for each application stack.
+* 📋 **Declarative Specification (`dockerfactor.yaml`):** Developers declare their build step (`build`), start command (`command`), and designated listening port (`port`).
+* 🤖 **Planned CI/CD:** GitHub Actions generation and zero-downtime rollout orchestration are roadmap items.
+
+---
+
+## 🤝 Shared Responsibility Model
+
+DockerFactor strictly delineates infrastructure security boundaries from application code logic:
+
+| Developer Responsibility | DockerFactor Responsibility |
+| :--- | :--- |
+| **Application Dockerizability:** Ensure code compiles (`build`) and runs in Linux/headless environments. | **Host & Zero-Trust Hardening:** Deny all public inbound ports (UFW / `DOCKER-USER` iptables). |
+| **Declarative Spec:** Define start command (`command`) and designated listening port (`port`) in `dockerfactor.yaml`. | **Container Security Defaults:** Enforce `USER 10001:10001`, `read_only: true`, `tmpfs /tmp`, `cap_drop: [ALL]`. |
+| **Environment & Secrets:** Provide application environment variables and database connections. | **Ingress Tunnel Orchestration:** Manage encrypted outbound mTLS & Cloudflare Tunnels. |
+* 📊 **Planned Auditor:** Evidence-based container and host checks will be added after the manifest and local lifecycle foundations are stable.
 
 ---
 
@@ -71,56 +93,52 @@ sequenceDiagram
 
 ## ⚡ Quick Start
 
-### 1. Provision a Fresh VPS (One-Liner)
-
-Connect to your target Linux VPS via SSH and run:
+### Inspect the example manifest
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/migueval/dockerfactor/main/install.sh | bash
-```
-
-This script automatically installs Docker Engine, Compose V2, `cloudflared`, closes all inbound firewall ports, and outputs your **Secure Pairing Token**.
-
-### 2. Pair and Deploy from Local Machine
-
-Connect your local machine to the VPS and deploy your project:
-
-```bash
-# Pair with target VPS
-docker-factor connect <YOUR_MAGIC_TOKEN>
-
-# Smart Dockerize & Deploy
-docker-factor deploy
+dotnet run --project src/DockerFactor.CLI -- inspect examples/hello-api
 ```
 
 ---
 
 ## 💻 CLI Commands
 
-| Command | Description |
-| :--- | :--- |
-| `docker-factor init` | Scans directory (.NET, Node, Go) and generates hardened `Dockerfile` & `compose.yaml` |
-| `docker-factor deploy` | Builds, hardens, provisions containers and binds Cloudflare Tunnel routing |
-| `docker-factor stats` | Opens interactive live Terminal UI (CPU%, RAM MB, log streamer) |
-| `docker-factor audit` | Runs a 12-Factor App compliance & Zero-Trust security scan |
-| `docker-factor init-ci` | Generates ready-to-use `.github/workflows/deploy.yml` for automated CI/CD |
+| Command | Status | Current behavior |
+| :--- | :--- | :--- |
+| `docker-factor inspect [DIR]` | Implemented | Read-only parsing and strict validation of `dockerfactor.yaml`. |
+| `docker-factor init` | Planned | Safe stack detection and artifact generation. |
+| `docker-factor tunnel` | Planned | Managed lifecycle for ephemeral and named ingress routes. |
+| `docker-factor deploy` | Planned | Reproducible local and remote deployment lifecycle. |
+| `docker-factor audit` | Planned | Evidence-based host and container checks. |
+| `docker-factor connect` | Planned | One-time server enrollment and workload identity. |
+| `docker-factor list` | Planned | Observed applications and ingress state. |
+| `docker-factor destroy` | Planned | Complete, verified container and ingress teardown. |
+| `docker-factor stats` | Planned | Interactive resource and log monitoring. |
+| `docker-factor init-ci` | Planned | GitHub Actions workflow generation. |
 
 ---
 
 ## 🗺️ Project Roadmap
 
-- [x] Architectural Specification & Threat Modeling (`v1alpha1`)
-- [ ] **Phase 1:** One-Line Installer Script (`install.sh`) & UFW Hardening
-- [ ] **Phase 2:** Cloudflare Tunnel Automation & Ingress Routing Engine
-- [ ] **Phase 3:** Core .NET 10 Native AOT CLI & Terminal UI (Spectre.Console)
-- [ ] **Phase 4:** Smart Docker Hardening Generator (.NET AOT, Node, Go)
-- [ ] **Phase 5:** Automated GitHub Actions Generator & Zero-Downtime Rollouts
+- [x] Initial architecture and security-engine drafts (`v1alpha1`)
+- [x] CLI skeleton and experimental Quick Tunnel adapter
+- [x] Initial hardening generators for common application stacks
+- [ ] **Stage 1:** Define the MVP, support matrix and acceptance criteria
+- [ ] **Stage 2:** Versioned `dockerfactor.yaml` schema and strict validation
+- [ ] **Stage 3:** Safe and tested stack detection and artifact generation
+- [ ] **Stage 4:** Verifiable container-hardening baseline
+- [ ] **Stage 5:** Reliable local deployment lifecycle and state management
+- [ ] **Stage 6:** Evidence-based audit engine
+- [ ] **Stage 7:** Managed and ephemeral ingress lifecycle
+- [ ] **Stage 8:** Recoverable VPS bootstrap and firewall hardening
+- [ ] **Stage 9:** One-time pairing, workload identity and outbound agent
+- [ ] **Stage 10:** Signed artifacts, CI/CD, observability and automatic rollback
 
 ---
 
 ## 🛠️ Built With
 
-* **CLI Engine:** C# (.NET 10 Native AOT) & Bash
+* **CLI Engine:** C# (.NET 9 with Native AOT enabled) & Bash
 * **Terminal UI:** [Spectre.Console](https://spectreconsole.net/)
 * **Ingress Security:** Cloudflare Tunnels (`cloudflared`) & Linux UFW / nftables
 * **Runtime:** Docker Engine & Docker Compose V2

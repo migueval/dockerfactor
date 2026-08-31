@@ -1,6 +1,6 @@
 # DockerFactor — Architecture Specification: Zero-Trust VPS Provisioning, Cloudflare Tunnels & Hardened CI/CD
 
-**Status:** Architecture Draft for Review  
+**Status:** Architecture vision and design draft — not fully implemented
 **Classification:** Open Source Technical Specification  
 **Author:** Miguel Valdez ([@migueval](https://github.com/migueval))  
 **License:** MIT  
@@ -8,6 +8,8 @@
 ---
 
 ## 1. Purpose
+
+> This document describes the intended target architecture. It is not a statement that every component or security property already exists in the current prototype. See the implementation-status section below and the README command matrix for current behavior.
 
 **DockerFactor** is an open-source automation platform designed to transform a fresh Linux VPS into a reproducible, isolated, observable, and hardened runtime environment for enterprise application containers.
 
@@ -25,6 +27,12 @@ Its objective goes beyond simply installing Docker Engine. It establishes and ma
 - Secure server decommissioning.
 
 DockerFactor functions as an independent, reusable infrastructure layer. Applications running on the VPS maintain complete independence from DockerFactor; the engine manages infrastructure, networking, artifacts, and deployments without leaking business domain rules into hosted applications.
+
+### 1.1 Current implementation status
+
+The first functional increment contains a clean Core/Engine/CLI separation, a versioned application manifest, strict YAML parsing and a read-only project inspection command. Hardening generators, Docker deployment, ingress adapters, the control plane, resident VPS agent, cryptographic enrollment, continuous reconciliation, append-only audit logging, signed artifact enforcement and automatic rollback remain roadmap work.
+
+Normative terms such as MUST and SHOULD in this document define acceptance criteria for the target architecture. They do not certify the current implementation.
 
 ---
 
@@ -70,6 +78,11 @@ While Cloudflare Tunnels (`cloudflared`) serve as the default zero-inbound ingre
 
 ### 3.7 Declarative Reconciliation & Drift Control
 The agent continuously reconciles the observed runtime state (active Docker containers, UFW firewall rules, tunnel bindings) against the declared manifest state. Any manual out-of-band mutations or container drifts are automatically detected, logged, and corrected.
+
+### 3.8 Shared Responsibility Model & Declarative App Spec
+DockerFactor strictly separates application developer responsibilities from platform infrastructure security:
+- **Developer Responsibility:** Ensuring application code compiles, is dockerizable, and declaring the execution build step (`build`), start command (`command`), and designated listening port (`port`) in `dockerfactor.yaml`.
+- **DockerFactor Responsibility:** Enforcing Zero-Trust host firewalling (UFW zero-inbound), container security profiles (`USER 10001`, `read_only: true`, `tmpfs /tmp`), and orchestrating encrypted outbound mTLS & Cloudflare Ingress tunnels.
 
 ---
 

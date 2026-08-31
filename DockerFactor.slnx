@@ -5,6 +5,7 @@
     <Project Path="src/DockerFactor.Engine/DockerFactor.Engine.csproj" />
   </Folder>
   <Folder Name="/tests/">
+    <Project Path="tests/DockerFactor.Core.Tests/DockerFactor.Core.Tests.csproj" />
     <Project Path="tests/DockerFactor.Engine.Tests/DockerFactor.Engine.Tests.csproj" />
   </Folder>
 </Solution>
