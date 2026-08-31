@@ -8,7 +8,7 @@ namespace DockerFactor.Engine.Manifests;
 
 public sealed class YamlManifestReader
 {
-    private readonly IDeserializer _deserializer = new DeserializerBuilder()
+    private readonly IDeserializer _deserializer = new StaticDeserializerBuilder(new DockerFactorYamlContext())
         .WithNamingConvention(CamelCaseNamingConvention.Instance)
         .WithDuplicateKeyChecking()
         .Build();
@@ -23,10 +23,28 @@ public sealed class YamlManifestReader
         try
         {
             using var input = File.OpenText(manifestPath);
-            var manifest = _deserializer.Deserialize<ApplicationManifest>(input);
+            var document = _deserializer.Deserialize<YamlApplicationManifest>(input);
 
-            if (manifest is null)
+            if (document is null)
                 return ManifestValidationResult.Invalid(new ValidationIssue("DFM006", "$", "Manifest is empty."));
+
+            var manifest = new ApplicationManifest
+            {
+                ApiVersion = document.ApiVersion,
+                Kind = document.Kind,
+                Metadata = document.Metadata is null
+                    ? null!
+                    : new ManifestMetadata { Name = document.Metadata.Name },
+                Spec = document.Spec is null
+                    ? null!
+                    : new ApplicationSpec
+                    {
+                        Runtime = document.Spec.Runtime,
+                        Port = document.Spec.Port,
+                        Build = document.Spec.Build,
+                        Command = document.Spec.Command
+                    }
+            };
 
             return new(manifest, _validator.Validate(manifest));
         }

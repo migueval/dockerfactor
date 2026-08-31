@@ -13,6 +13,7 @@ This increment establishes the application manifest and read-only inspection wor
 
 ### Clean project boundaries
 
+- All projects target .NET 10, and the CLI is configured for Native AOT publication.
 - `DockerFactor.Core` contains domain contracts and abstractions.
 - `DockerFactor.Engine` contains YAML parsing, validation and inspection behavior.
 - `DockerFactor.CLI` exposes the user-facing command-line entry point.
@@ -71,7 +72,7 @@ Exit codes form part of the CLI contract:
 
 ## Verification
 
-The repository currently builds with zero compiler warnings and zero errors. The automated suite contains eight passing tests across the Core and Engine layers. The included `examples/hello-api/dockerfactor.yaml` manifest has also been validated through the real CLI entry point.
+The repository currently builds with zero compiler warnings and zero errors on .NET 10. The automated suite contains eight passing tests across the Core and Engine layers. A real `win-x64` Native AOT executable was published successfully and used to validate `examples/hello-api/dockerfactor.yaml`; the native process returned exit code `0`.
 
 ## Explicitly Not Implemented Yet
 

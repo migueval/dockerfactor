@@ -6,11 +6,14 @@
 
 ### Added
 
-- Clean `Core`, `Engine` and `CLI` project boundaries targeting .NET 9.
+- Clean `Core`, `Engine` and `CLI` project boundaries targeting .NET 10.
 - Versioned `dockerfactor.dev/v1alpha1` application manifest.
 - Strict YAML parsing with unknown-field and duplicate-key rejection.
 - Read-only `docker-factor inspect [DIR]` command.
 - Stable manifest validation codes and automated tests.
+- Official .NET 10 baseline pinned through `global.json` and shared build properties.
+- Native AOT-compatible static YAML deserialization with source-generated metadata.
+- Verified `win-x64` native executable publication and manifest inspection.
 
 All notable changes to **DockerFactor** will be documented in this file.
 

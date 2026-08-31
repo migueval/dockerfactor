@@ -14,7 +14,7 @@
 
 [![Status](https://img.shields.io/badge/Status-Active_Development-orange.svg?style=for-the-badge)]()
 [![License](https://img.shields.io/badge/License-MIT-blue.svg?style=for-the-badge)](LICENSE)
-[![Runtime](https://img.shields.io/badge/.NET_9-Native_AOT-purple.svg?style=for-the-badge)]()
+[![Runtime](https://img.shields.io/badge/.NET_10-Native_AOT-purple.svg?style=for-the-badge)]()
 [![Security](https://img.shields.io/badge/Security-Zero_Trust-green.svg?style=for-the-badge)]()
 
 [Motivation](#-motivation) • [Features](#-key-features) • [Architecture](ARCHITECTURE.md) • [Quick Start](#-quick-start) • [CLI Reference](#-cli-commands) • [Roadmap](#-roadmap)
@@ -138,7 +138,7 @@ dotnet run --project src/DockerFactor.CLI -- inspect examples/hello-api
 
 ## 🛠️ Built With
 
-* **CLI Engine:** C# (.NET 9 with Native AOT enabled) & Bash
+* **CLI Engine:** C# (.NET 10 Native AOT) & Bash
 * **Terminal UI:** [Spectre.Console](https://spectreconsole.net/)
 * **Ingress Security:** Cloudflare Tunnels (`cloudflared`) & Linux UFW / nftables
 * **Runtime:** Docker Engine & Docker Compose V2
