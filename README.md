@@ -101,6 +101,8 @@ dotnet run --project src/DockerFactor.CLI -- validate examples/hello-api --outpu
 dotnet run --project src/DockerFactor.CLI -- init path/to/your-app --dry-run
 ```
 
+For a complete hands-on exercise, use the [.NET 10 Example API](examples/dotnet-api/README.md). It starts without a manifest so you can test preview, creation, validation and overwrite protection yourself.
+
 ---
 
 ## 💻 CLI Commands

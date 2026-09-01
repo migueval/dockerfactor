@@ -22,6 +22,7 @@
 - Added safe `init` with deterministic runtime defaults, `--dry-run`, JSON preview and explicit `--force` replacement.
 - Added atomic create-new behavior and conflict exit code `3` to protect existing manifests.
 - Added initialization documentation and expanded the automated suite to 24 tests.
+- Added a runnable ASP.NET Core .NET 10 example API for hands-on init, validation and runtime testing.
 
 All notable changes to **DockerFactor** will be documented in this file.
 

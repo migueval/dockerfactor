@@ -1,4 +1,8 @@
 <Solution>
+  <Folder Name="/examples/" />
+  <Folder Name="/examples/dotnet-api/">
+    <Project Path="examples/dotnet-api/DockerFactor.ExampleApi.csproj" />
+  </Folder>
   <Folder Name="/src/">
     <Project Path="src/DockerFactor.CLI/DockerFactor.CLI.csproj" />
     <Project Path="src/DockerFactor.Core/DockerFactor.Core.csproj" />
