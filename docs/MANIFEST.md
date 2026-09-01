@@ -62,6 +62,7 @@ docker-factor inspect ./my-app
 docker-factor inspect ./my-app --output json
 docker-factor validate ./my-app
 docker-factor validate ./my-app --strict --output json
+docker-factor init ./my-app --dry-run
 ```
 
-Exit codes are `0` for success, `2` for validation failure and `64` for invalid CLI usage. JSON output is written to stdout and is intended for CI and editor integrations.
+Exit codes are `0` for success, `2` for validation failure, `3` when init refuses to overwrite an existing manifest, `64` for invalid CLI usage and `74` for filesystem write failures. JSON output is written to stdout and is intended for CI and editor integrations.

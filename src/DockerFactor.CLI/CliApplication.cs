@@ -1,5 +1,7 @@
 using DockerFactor.Core.Inspection;
+using DockerFactor.Core.Initialization;
 using DockerFactor.Core.Validation;
+using DockerFactor.Engine.Initialization;
 using DockerFactor.Engine.Inspection;
 
 namespace DockerFactor.CLI;
@@ -25,6 +27,9 @@ public static class CliApplication
             return 0;
         }
 
+        if (options.Command == "init")
+            return RunInit(options, output, error);
+
         var inspection = new ProjectInspector().Inspect(options.Directory);
         var hasErrors = inspection.Validation.Issues.Any(issue => issue.Severity == ValidationSeverity.Error) ||
                         inspection.Validation.Manifest is null;
@@ -39,6 +44,66 @@ public static class CliApplication
             WriteValidation(output, error, inspection, effectiveValid, options.Strict);
 
         return effectiveValid ? 0 : 2;
+    }
+
+    private static int RunInit(CliOptions options, TextWriter output, TextWriter error)
+    {
+        try
+        {
+            var initializer = new ManifestInitializer();
+            var proposal = initializer.Propose(options.Directory);
+
+            if (options.DryRun)
+            {
+                if (options.Json) JsonInitializationWriter.Write(output, proposal, "preview");
+                else WriteInitText(output, proposal, "Preview only; no file was written.", includeYaml: true);
+                return 0;
+            }
+
+            var status = initializer.Write(proposal, options.Force);
+            if (status == ManifestWriteStatus.Refused)
+            {
+                if (options.Json) JsonInitializationWriter.Write(output, proposal, "refused");
+                else error.WriteLine($"Refusing to overwrite existing manifest: {proposal.ManifestPath}. Use --force to replace it explicitly.");
+                return 3;
+            }
+
+            var statusText = status == ManifestWriteStatus.Created ? "created" : "overwritten";
+            if (options.Json) JsonInitializationWriter.Write(output, proposal, statusText);
+            else WriteInitText(output, proposal, $"Manifest {statusText}: {proposal.ManifestPath}", includeYaml: false);
+            return 0;
+        }
+        catch (DirectoryNotFoundException exception)
+        {
+            error.WriteLine(exception.Message);
+            return 2;
+        }
+        catch (IOException exception)
+        {
+            error.WriteLine($"Could not write manifest: {exception.Message}");
+            return 74;
+        }
+        catch (UnauthorizedAccessException exception)
+        {
+            error.WriteLine($"Could not write manifest: {exception.Message}");
+            return 74;
+        }
+    }
+
+    private static void WriteInitText(TextWriter output, ManifestProposal proposal, string message, bool includeYaml)
+    {
+        output.WriteLine("DockerFactor manifest initialization");
+        output.WriteLine($"Project:  {proposal.ProjectDirectory}");
+        output.WriteLine($"Detected: {proposal.Detection.Runtime ?? "unknown"}" +
+                         (proposal.Detection.Evidence is null ? string.Empty : $" ({proposal.Detection.Evidence})"));
+        output.WriteLine($"Runtime:  {proposal.Manifest.Spec.Runtime}");
+        output.WriteLine($"Port:     {proposal.Manifest.Spec.Port}");
+        output.WriteLine(message);
+        if (includeYaml)
+        {
+            output.WriteLine();
+            output.Write(proposal.Content);
+        }
     }
 
     private static void WriteInspection(TextWriter output, TextWriter error, ProjectInspection inspection, bool valid)
@@ -86,7 +151,8 @@ public static class CliApplication
         writer.WriteLine("Usage:");
         writer.WriteLine("  docker-factor inspect [PROJECT_DIRECTORY] [--output text|json]");
         writer.WriteLine("  docker-factor validate [PROJECT_DIRECTORY] [--strict] [--output text|json]");
+        writer.WriteLine("  docker-factor init [PROJECT_DIRECTORY] [--dry-run|--force] [--output text|json]");
         writer.WriteLine();
-        writer.WriteLine("Both commands are read-only. Strict mode treats warnings as validation failures.");
+        writer.WriteLine("Inspect and validate are read-only. Init never overwrites an existing manifest unless --force is provided.");
     }
 }

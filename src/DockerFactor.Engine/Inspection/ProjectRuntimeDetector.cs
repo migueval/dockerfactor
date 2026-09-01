@@ -12,6 +12,7 @@ public sealed class ProjectRuntimeDetector
             return new(null, null);
 
         var dotnetFile = Directory.EnumerateFiles(projectDirectory, "*.csproj", SearchOption.TopDirectoryOnly)
+            .Order(StringComparer.Ordinal)
             .Concat(Directory.EnumerateFiles(projectDirectory, "*.slnx", SearchOption.TopDirectoryOnly))
             .FirstOrDefault();
         if (dotnetFile is not null)

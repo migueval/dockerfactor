@@ -19,6 +19,9 @@
 - Added manifest size, recursion, anchor, alias and explicit-tag defenses.
 - Published the v1alpha1 JSON Schema and manifest reference documentation.
 - Added CLI-level tests, bringing the automated suite to 19 tests.
+- Added safe `init` with deterministic runtime defaults, `--dry-run`, JSON preview and explicit `--force` replacement.
+- Added atomic create-new behavior and conflict exit code `3` to protect existing manifests.
+- Added initialization documentation and expanded the automated suite to 24 tests.
 
 All notable changes to **DockerFactor** will be documented in this file.
 

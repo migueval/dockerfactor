@@ -1,13 +1,13 @@
 # DockerFactor Development Progress
 
 **Updated:** August 31, 2026
-**Status:** Second functional increment completed
+**Status:** Third functional increment completed
 
 ## Summary
 
 DockerFactor has been intentionally rebuilt from a clean foundation. The previous exploratory prototype was removed so future capabilities can be implemented around explicit contracts, testable behavior and evidence-based security claims.
 
-The first two increments establish the application manifest and read-only inspection/validation workflows. They do not deploy containers, modify the host, open tunnels or change firewall rules.
+The first three increments establish the application manifest, read-only inspection/validation and safe manifest initialization. They do not deploy containers, modify the host, open tunnels or change firewall rules.
 
 ## Delivered
 
@@ -79,9 +79,17 @@ Exit codes form part of the CLI contract:
 - Runtime detection supports .NET, Node, Angular, NestJS, Go and Python projects without modifying them.
 - Defensive parsing rejects oversized manifests, excessive recursion, anchors, aliases and explicit YAML tags.
 
+### Safe initialization
+
+- `init --dry-run` previews deterministic YAML without writing.
+- Normal initialization creates a UTF-8 manifest only when it does not exist.
+- Existing manifests are preserved and return exit code `3`.
+- Replacement requires the explicit `--force` option.
+- Defaults cover .NET, Node, Angular, NestJS, Go, Python and generic projects.
+
 ## Verification
 
-The repository currently builds with zero compiler warnings and zero errors on .NET 10. The automated suite contains 19 passing tests across the Core, Engine and CLI layers. A real `win-x64` Native AOT executable was published successfully and used to validate `examples/hello-api/dockerfactor.yaml` through JSON output; the native process returned exit code `0`.
+The repository currently builds with zero compiler warnings and zero errors on .NET 10. The automated suite contains 24 passing tests across the Core, Engine and CLI layers. Native AOT smoke tests cover preview, creation, conflict protection and explicit replacement behavior.
 
 ## Explicitly Not Implemented Yet
 
@@ -98,4 +106,4 @@ These remain roadmap items and must not be inferred from the target architecture
 
 ## Next Increment
 
-The next recommended increment is a safe initialization workflow that detects the project, previews a proposed manifest and never overwrites user files without explicit approval.
+The next recommended increment is safe Dockerfile and Compose planning: generate an in-memory deployment plan, validate it, display a diff and keep all filesystem changes behind explicit write flags.

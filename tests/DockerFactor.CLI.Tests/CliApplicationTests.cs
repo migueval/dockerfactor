@@ -47,6 +47,37 @@ public sealed class CliApplicationTests : IDisposable
         Assert.Equal(64, exitCode);
     }
 
+    [Fact]
+    public void Init_dry_run_previews_without_writing()
+    {
+        File.WriteAllText(Path.Combine(_directory, "App.csproj"), "<Project />");
+        using var output = new StringWriter();
+
+        var exitCode = CliApplication.Run(["init", _directory, "--dry-run", "--output", "json"], output, new StringWriter());
+        using var json = JsonDocument.Parse(output.ToString());
+
+        Assert.Equal(0, exitCode);
+        Assert.Equal("preview", json.RootElement.GetProperty("status").GetString());
+        Assert.False(File.Exists(Path.Combine(_directory, "dockerfactor.yaml")));
+    }
+
+    [Fact]
+    public void Init_refuses_existing_manifest_and_force_is_explicit()
+    {
+        WriteManifest("go");
+        var manifestPath = Path.Combine(_directory, "dockerfactor.yaml");
+        var original = File.ReadAllText(manifestPath);
+
+        var refusedExit = CliApplication.Run(["init", _directory], new StringWriter(), new StringWriter());
+        var afterRefusal = File.ReadAllText(manifestPath);
+        var forcedExit = CliApplication.Run(["init", _directory, "--force"], new StringWriter(), new StringWriter());
+
+        Assert.Equal(3, refusedExit);
+        Assert.Equal(original, afterRefusal);
+        Assert.Equal(0, forcedExit);
+        Assert.NotEqual(original, File.ReadAllText(manifestPath));
+    }
+
     private void WriteManifest(string runtime) => File.WriteAllText(Path.Combine(_directory, "dockerfactor.yaml"), $$"""
         apiVersion: dockerfactor.dev/v1alpha1
         kind: Application

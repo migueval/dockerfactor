@@ -26,7 +26,7 @@
 
 ## Current scope
 
-The current foundation provides a strict, versioned `dockerfactor.yaml` contract plus read-only `inspect` and `validate` commands. It includes deterministic JSON output for CI, project runtime detection, stable diagnostics and defensive YAML limits. See the [manifest reference](docs/MANIFEST.md).
+The current foundation provides a strict, versioned `dockerfactor.yaml` contract, read-only inspection and validation, and safe manifest initialization. It includes deterministic JSON output for CI, project runtime detection, stable diagnostics and defensive YAML limits. See the [manifest reference](docs/MANIFEST.md) and [safe initialization guide](docs/INIT.md).
 
 DockerFactor does not currently provide a production control plane, functional mTLS enrollment, continuous reconciliation, immutable audit storage, blue/green deployments or automatic rollback.
 
@@ -98,6 +98,7 @@ sequenceDiagram
 ```bash
 dotnet run --project src/DockerFactor.CLI -- inspect examples/hello-api
 dotnet run --project src/DockerFactor.CLI -- validate examples/hello-api --output json
+dotnet run --project src/DockerFactor.CLI -- init path/to/your-app --dry-run
 ```
 
 ---
@@ -108,7 +109,7 @@ dotnet run --project src/DockerFactor.CLI -- validate examples/hello-api --outpu
 | :--- | :--- | :--- |
 | `docker-factor inspect [DIR]` | Implemented | Read-only parsing and strict validation of `dockerfactor.yaml`. |
 | `docker-factor validate [DIR]` | Implemented | CI-oriented validation with JSON output and optional strict warning handling. |
-| `docker-factor init` | Planned | Safe stack detection and artifact generation. |
+| `docker-factor init [DIR]` | Implemented | Preview or safely create `dockerfactor.yaml`; refuses overwrite without `--force`. |
 | `docker-factor tunnel` | Planned | Managed lifecycle for ephemeral and named ingress routes. |
 | `docker-factor deploy` | Planned | Reproducible local and remote deployment lifecycle. |
 | `docker-factor audit` | Planned | Evidence-based host and container checks. |
@@ -127,7 +128,7 @@ dotnet run --project src/DockerFactor.CLI -- validate examples/hello-api --outpu
 - [x] Initial hardening generators for common application stacks
 - [ ] **Stage 1:** Define the MVP, support matrix and acceptance criteria
 - [x] **Stage 2:** Versioned `dockerfactor.yaml` schema and strict validation
-- [ ] **Stage 3:** Safe and tested stack detection and artifact generation
+- [x] **Stage 3:** Safe project detection and manifest initialization
 - [ ] **Stage 4:** Verifiable container-hardening baseline
 - [ ] **Stage 5:** Reliable local deployment lifecycle and state management
 - [ ] **Stage 6:** Evidence-based audit engine

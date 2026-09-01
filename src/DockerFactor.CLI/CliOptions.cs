@@ -1,6 +1,6 @@
 namespace DockerFactor.CLI;
 
-internal sealed record CliOptions(string Command, string Directory, bool Json, bool Strict)
+internal sealed record CliOptions(string Command, string Directory, bool Json, bool Strict, bool DryRun, bool Force)
 {
     public static bool TryParse(string[] args, out CliOptions? options, out string? error)
     {
@@ -11,7 +11,7 @@ internal sealed record CliOptions(string Command, string Directory, bool Json, b
             return true;
 
         var command = args[0].ToLowerInvariant();
-        if (command is not ("inspect" or "validate"))
+        if (command is not ("inspect" or "validate" or "init"))
         {
             error = $"Unknown command: {args[0]}";
             return false;
@@ -20,6 +20,8 @@ internal sealed record CliOptions(string Command, string Directory, bool Json, b
         var directory = ".";
         var json = false;
         var strict = false;
+        var dryRun = false;
+        var force = false;
         var directoryAssigned = false;
 
         for (var index = 1; index < args.Length; index++)
@@ -33,6 +35,28 @@ internal sealed record CliOptions(string Command, string Directory, bool Json, b
                     return false;
                 }
                 strict = true;
+                continue;
+            }
+
+            if (argument == "--dry-run")
+            {
+                if (command != "init")
+                {
+                    error = "--dry-run is only valid with the init command.";
+                    return false;
+                }
+                dryRun = true;
+                continue;
+            }
+
+            if (argument == "--force")
+            {
+                if (command != "init")
+                {
+                    error = "--force is only valid with the init command.";
+                    return false;
+                }
+                force = true;
                 continue;
             }
 
@@ -63,7 +87,13 @@ internal sealed record CliOptions(string Command, string Directory, bool Json, b
             directoryAssigned = true;
         }
 
-        options = new(command, directory, json, strict);
+        if (dryRun && force)
+        {
+            error = "--dry-run and --force cannot be used together.";
+            return false;
+        }
+
+        options = new(command, directory, json, strict, dryRun, force);
         return true;
     }
 }
