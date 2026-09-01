@@ -22,4 +22,14 @@ public sealed class ManifestValidationResultTests
         Assert.Null(result.Manifest);
         Assert.Single(result.Issues);
     }
+
+    [Fact]
+    public void Warnings_do_not_make_the_manifest_invalid()
+    {
+        var result = new ManifestValidationResult(
+            new ApplicationManifest(),
+            [new ValidationIssue("DFM101", "spec.runtime", "mismatch", ValidationSeverity.Warning)]);
+
+        Assert.True(result.IsValid);
+    }
 }

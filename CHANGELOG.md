@@ -14,6 +14,11 @@
 - Official .NET 10 baseline pinned through `global.json` and shared build properties.
 - Native AOT-compatible static YAML deserialization with source-generated metadata.
 - Verified `win-x64` native executable publication and manifest inspection.
+- Added `validate`, deterministic JSON output and strict warning handling for CI.
+- Added read-only project runtime detection for .NET, Node, Angular, NestJS, Go and Python.
+- Added manifest size, recursion, anchor, alias and explicit-tag defenses.
+- Published the v1alpha1 JSON Schema and manifest reference documentation.
+- Added CLI-level tests, bringing the automated suite to 19 tests.
 
 All notable changes to **DockerFactor** will be documented in this file.
 

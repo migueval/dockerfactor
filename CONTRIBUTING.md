@@ -66,7 +66,7 @@ cd dockerfactor
 dotnet run --project src/DockerFactor.Cli
 
 # Test Native AOT Build locally
-dotnet publish src/DockerFactor.Cli -c Release -r linux-x64 /p:PublishAot=true
+dotnet publish src/DockerFactor.CLI -c Release -r linux-x64 /p:PublishAot=true
 ```
 
 ---

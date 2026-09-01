@@ -1,6 +1,7 @@
 using DockerFactor.Core.Manifests;
 using DockerFactor.Core.Validation;
 using YamlDotNet.Core;
+using YamlDotNet.Core.Events;
 using YamlDotNet.Serialization;
 using YamlDotNet.Serialization.NamingConventions;
 
@@ -8,9 +9,12 @@ namespace DockerFactor.Engine.Manifests;
 
 public sealed class YamlManifestReader
 {
+    public const long MaximumManifestBytes = 128 * 1024;
+
     private readonly IDeserializer _deserializer = new StaticDeserializerBuilder(new DockerFactorYamlContext())
         .WithNamingConvention(CamelCaseNamingConvention.Instance)
         .WithDuplicateKeyChecking()
+        .WithMaximumRecursion(32)
         .Build();
 
     private readonly ManifestValidator _validator = new();
@@ -22,7 +26,16 @@ public sealed class YamlManifestReader
 
         try
         {
-            using var input = File.OpenText(manifestPath);
+            var file = new FileInfo(manifestPath);
+            if (file.Length > MaximumManifestBytes)
+                return ManifestValidationResult.Invalid(new ValidationIssue("DFM008", manifestPath, $"Manifest exceeds the {MaximumManifestBytes}-byte limit."));
+
+            var content = File.ReadAllText(manifestPath);
+            var unsafeFeature = FindUnsafeYamlFeature(content);
+            if (unsafeFeature is not null)
+                return ManifestValidationResult.Invalid(unsafeFeature);
+
+            using var input = new StringReader(content);
             var document = _deserializer.Deserialize<YamlApplicationManifest>(input);
 
             if (document is null)
@@ -63,5 +76,25 @@ public sealed class YamlManifestReader
         {
             return ManifestValidationResult.Invalid(new ValidationIssue("DFM007", manifestPath, exception.Message));
         }
+    }
+
+    private static ValidationIssue? FindUnsafeYamlFeature(string content)
+    {
+        var parser = new Parser(new StringReader(content));
+        while (parser.MoveNext())
+        {
+            if (parser.Current is AnchorAlias alias)
+                return new("DFM009", $"line {alias.Start.Line}, column {alias.Start.Column}", "YAML aliases are not allowed.");
+
+            if (parser.Current is NodeEvent node)
+            {
+                if (!node.Anchor.IsEmpty)
+                    return new("DFM009", $"line {node.Start.Line}, column {node.Start.Column}", "YAML anchors are not allowed.");
+                if (!node.Tag.IsEmpty)
+                    return new("DFM010", $"line {node.Start.Line}, column {node.Start.Column}", "Explicit YAML tags are not allowed.");
+            }
+        }
+
+        return null;
     }
 }

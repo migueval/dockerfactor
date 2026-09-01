@@ -10,7 +10,7 @@ public sealed partial class ManifestValidator
     public const string SupportedKind = "Application";
 
     private static readonly HashSet<string> SupportedRuntimes =
-        new(StringComparer.OrdinalIgnoreCase) { "dotnet", "node", "angular", "nestjs", "go", "python", "generic" };
+        new(StringComparer.Ordinal) { "dotnet", "node", "angular", "nestjs", "go", "python", "generic" };
 
     public IReadOnlyList<ValidationIssue> Validate(ApplicationManifest manifest)
     {

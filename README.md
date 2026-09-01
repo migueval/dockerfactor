@@ -26,7 +26,7 @@
 
 ## Current scope
 
-The first functional increment provides a strict, versioned `dockerfactor.yaml` contract and a read-only `inspect` command. It parses real YAML, rejects unknown or duplicate fields and reports stable validation codes suitable for local use and CI.
+The current foundation provides a strict, versioned `dockerfactor.yaml` contract plus read-only `inspect` and `validate` commands. It includes deterministic JSON output for CI, project runtime detection, stable diagnostics and defensive YAML limits. See the [manifest reference](docs/MANIFEST.md).
 
 DockerFactor does not currently provide a production control plane, functional mTLS enrollment, continuous reconciliation, immutable audit storage, blue/green deployments or automatic rollback.
 
@@ -97,6 +97,7 @@ sequenceDiagram
 
 ```bash
 dotnet run --project src/DockerFactor.CLI -- inspect examples/hello-api
+dotnet run --project src/DockerFactor.CLI -- validate examples/hello-api --output json
 ```
 
 ---
@@ -106,6 +107,7 @@ dotnet run --project src/DockerFactor.CLI -- inspect examples/hello-api
 | Command | Status | Current behavior |
 | :--- | :--- | :--- |
 | `docker-factor inspect [DIR]` | Implemented | Read-only parsing and strict validation of `dockerfactor.yaml`. |
+| `docker-factor validate [DIR]` | Implemented | CI-oriented validation with JSON output and optional strict warning handling. |
 | `docker-factor init` | Planned | Safe stack detection and artifact generation. |
 | `docker-factor tunnel` | Planned | Managed lifecycle for ephemeral and named ingress routes. |
 | `docker-factor deploy` | Planned | Reproducible local and remote deployment lifecycle. |
@@ -124,7 +126,7 @@ dotnet run --project src/DockerFactor.CLI -- inspect examples/hello-api
 - [x] CLI skeleton and experimental Quick Tunnel adapter
 - [x] Initial hardening generators for common application stacks
 - [ ] **Stage 1:** Define the MVP, support matrix and acceptance criteria
-- [ ] **Stage 2:** Versioned `dockerfactor.yaml` schema and strict validation
+- [x] **Stage 2:** Versioned `dockerfactor.yaml` schema and strict validation
 - [ ] **Stage 3:** Safe and tested stack detection and artifact generation
 - [ ] **Stage 4:** Verifiable container-hardening baseline
 - [ ] **Stage 5:** Reliable local deployment lifecycle and state management

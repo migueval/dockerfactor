@@ -1,13 +1,13 @@
 # DockerFactor Development Progress
 
 **Updated:** August 31, 2026
-**Status:** First functional increment completed
+**Status:** Second functional increment completed
 
 ## Summary
 
 DockerFactor has been intentionally rebuilt from a clean foundation. The previous exploratory prototype was removed so future capabilities can be implemented around explicit contracts, testable behavior and evidence-based security claims.
 
-This increment establishes the application manifest and read-only inspection workflow. It does not deploy containers, modify the host, open tunnels or change firewall rules.
+The first two increments establish the application manifest and read-only inspection/validation workflows. They do not deploy containers, modify the host, open tunnels or change firewall rules.
 
 ## Delivered
 
@@ -56,6 +56,7 @@ The implemented command is:
 
 ```bash
 docker-factor inspect [PROJECT_DIRECTORY]
+docker-factor validate [PROJECT_DIRECTORY] [--strict] [--output text|json]
 ```
 
 During development it can be executed with:
@@ -66,13 +67,21 @@ dotnet run --project src/DockerFactor.CLI -- inspect examples/hello-api
 
 Exit codes form part of the CLI contract:
 
-- `0`: help or valid manifest;
+- `0`: help or successful validation;
 - `2`: invalid or missing manifest;
 - `64`: invalid command usage.
 
+### CI and editor contract
+
+- Deterministic JSON output is available through `--output json`.
+- Strict mode promotes runtime-detection warnings to validation failures.
+- A public Draft 2020-12 JSON Schema documents the v1alpha1 contract.
+- Runtime detection supports .NET, Node, Angular, NestJS, Go and Python projects without modifying them.
+- Defensive parsing rejects oversized manifests, excessive recursion, anchors, aliases and explicit YAML tags.
+
 ## Verification
 
-The repository currently builds with zero compiler warnings and zero errors on .NET 10. The automated suite contains eight passing tests across the Core and Engine layers. A real `win-x64` Native AOT executable was published successfully and used to validate `examples/hello-api/dockerfactor.yaml`; the native process returned exit code `0`.
+The repository currently builds with zero compiler warnings and zero errors on .NET 10. The automated suite contains 19 passing tests across the Core, Engine and CLI layers. A real `win-x64` Native AOT executable was published successfully and used to validate `examples/hello-api/dockerfactor.yaml` through JSON output; the native process returned exit code `0`.
 
 ## Explicitly Not Implemented Yet
 
@@ -89,4 +98,4 @@ These remain roadmap items and must not be inferred from the target architecture
 
 ## Next Increment
 
-The next recommended increment is to finish the public manifest contract by adding machine-readable CLI output, schema documentation, compatibility tests and a safe initialization workflow that never overwrites user files without explicit approval.
+The next recommended increment is a safe initialization workflow that detects the project, previews a proposed manifest and never overwrites user files without explicit approval.
